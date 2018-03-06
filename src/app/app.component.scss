@@ -1,0 +1,78 @@
+.iphone {
+    display: flex;
+    flex-direction: column;
+}
+
+.top-container {}
+
+.bottom-container {
+    width: 750px;
+    height: 1334px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    background: black;
+    padding: 0px 33px 32px 32px;
+}
+
+.right-operator-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    .right-operator {
+        margin: 28px 0px 0px 0px;
+        padding: 0px;
+        width: 150px;
+        height: 150px;
+        border-radius: 75px;
+        font-size: 88px;
+        border: none;
+        background: #ff9500;
+        color: white;
+        padding-bottom: 12px;
+        padding-right: 3px;
+    }
+}
+
+.number-container {
+    .number {
+        margin: 28px 24px 0px 0px;
+        padding: 0px;
+        width: 150px;
+        height: 150px;
+        border-radius: 75px;
+        font-size: 72px;
+        border: none;
+        background: #333333;
+        color: white;
+        padding-right: 3px;
+    }
+    .zero {
+        width: 328px;
+        padding-left: 52px;
+        text-align: left;
+    }
+}
+
+.symbol-container {
+    .number {
+        margin: 28px 24px 0px 0px;
+        padding: 0px;
+        width: 150px;
+        height: 150px;
+        border-radius: 75px;
+        font-size: 58px;
+        border: none;
+        background: #a6a6a6;
+        color: black;
+        padding-right: 3px;
+    }
+    .plus-minus {
+        font-variant: diagonal-fractions;
+    }
+}
+
+.left-container {
+    display: flex;
+    flex-direction: column;
+}

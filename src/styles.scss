@@ -1,1 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
+
+@font-face {
+    font-family: SF;
+    src: url("assets/SF-UI-Display-Regular.otf") format("opentype");
+}
+
+@font-face {
+    font-family: SF-Text;
+    src: url("assets/SF-UI-Text-Regular.otf") format("opentype");
+}
+
+body {
+    margin: 0px;
+    background: lightgrey;
+}
+
+* {
+    font-family: SF-TEXT;
+    box-sizing: border-box;
+}
