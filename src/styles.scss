@@ -10,6 +10,12 @@
     src: url("assets/SF-UI-Text-Regular.otf") format("opentype");
 }
 
+@font-face {
+    font-family: SF-Text;
+    src: url("assets/SF-UI-Text-Light.otf") format("opentype");
+    font-weight: 300;
+}
+
 body {
     margin: 0px;
     background: lightgrey;

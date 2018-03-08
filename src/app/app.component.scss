@@ -1,24 +1,47 @@
 .iphone {
-    display: flex;
-    flex-direction: column;
-}
-
-.top-container {}
-
-.bottom-container {
     width: 750px;
     height: 1334px;
     display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
+    flex-direction: column;
     background: black;
     padding: 0px 33px 32px 32px;
+    button {
+        outline: unset;
+    }
+}
+
+.top-container {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    .calc-display {
+        flex: 1;
+        height: 100px;
+        font-size: 190px;
+        font-weight: 100;
+        margin: 0px -5px 50px 0px;
+        display: flex;
+        align-items: center;
+        direction: rtl;
+        color: white;
+    }
+}
+
+.bottom-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
 }
 
 .right-operator-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    .right-operator:active {
+        transition: unset;
+        background: #fcc78d;
+    }
     .right-operator {
         margin: 28px 0px 0px 0px;
         padding: 0px;
@@ -31,10 +54,15 @@
         color: white;
         padding-bottom: 12px;
         padding-right: 3px;
+        transition: background 500ms ease-out;
     }
 }
 
 .number-container {
+    .number:active {
+        transition: unset;
+        background: #737373;
+    }
     .number {
         margin: 28px 24px 0px 0px;
         padding: 0px;
@@ -46,6 +74,7 @@
         background: #333333;
         color: white;
         padding-right: 3px;
+        transition: background 500ms ease-out;
     }
     .zero {
         width: 328px;
@@ -55,7 +84,11 @@
 }
 
 .symbol-container {
-    .number {
+    .symbol:active {
+        transition: unset;
+        background: #d9d9d9;
+    }
+    .symbol {
         margin: 28px 24px 0px 0px;
         padding: 0px;
         width: 150px;
@@ -66,6 +99,7 @@
         background: #a6a6a6;
         color: black;
         padding-right: 3px;
+        transition: background 500ms ease-out;
     }
     .plus-minus {
         font-variant: diagonal-fractions;
