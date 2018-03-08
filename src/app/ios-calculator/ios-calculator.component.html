@@ -1,32 +1,34 @@
-<div class="top-container">
-    <span class="calc-display">20</span>
-</div>
-<div class="bottom-container">
-    <div class="left-container">
-        <div class="symbol-container">
-            <button class="symbol">AC</button>
-            <button class="symbol plus-minus">+/−</button>
-            <button class="symbol test">%</button>
-        </div>
-        <div class="number-container">
-            <button class="number">7</button>
-            <button class="number">8</button>
-            <button class="number">9</button>
-            <button class="number">4</button>
-            <button class="number">5</button>
-            <button class="number">6</button>
-            <button class="number">1</button>
-            <button class="number">2</button>
-            <button class="number">3</button>
-            <button class="number zero">0</button>
-            <button class="number">.</button>
-        </div>
+<div class="container">
+    <div class="top-container">
+        <span class="calc-display">20</span>
     </div>
-    <div class="right-operator-container">
-        <button class="right-operator">÷</button>
-        <button class="right-operator">×</button>
-        <button class="right-operator">−</button>
-        <button class="right-operator">+</button>
-        <button class="right-operator">=</button>
+    <div class="bottom-container">
+        <div class="left-container">
+            <div class="symbol-container">
+                <button class="symbol">AC</button>
+                <button class="symbol plus-minus">+/−</button>
+                <button class="symbol test">%</button>
+            </div>
+            <div class="number-container">
+                <button class="number">7</button>
+                <button class="number">8</button>
+                <button class="number">9</button>
+                <button class="number">4</button>
+                <button class="number">5</button>
+                <button class="number">6</button>
+                <button class="number">1</button>
+                <button class="number">2</button>
+                <button class="number">3</button>
+                <button class="number zero">0</button>
+                <button class="number">.</button>
+            </div>
+        </div>
+        <div class="right-operator-container">
+            <button (click)="clickOperator(divide)" class="right-operator">÷</button>
+            <button (click)="clickOperator(multiply)" class="right-operator">×</button>
+            <button (click)="clickOperator(minus)" class="right-operator">−</button>
+            <button (click)="clickOperator(add)" class="right-operator">+</button>
+            <button (click)="clickOperator(equal)" class="right-operator">=</button>
+        </div>
     </div>
 </div>

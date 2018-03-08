@@ -8,11 +8,20 @@ import { Component, OnInit } from '@angular/core';
 export class IosCalculatorComponent implements OnInit {
 
     currentValue: number;
+    displayedValue: number;
     operator: CalculatorOperator;
 
     constructor() { }
 
     ngOnInit() {
+
+    }
+
+    clickNumber(num: number) {
+
+    }
+
+    clickOperator(operator: CalculatorOperator) {
 
     }
 
@@ -27,4 +36,5 @@ export enum CalculatorOperator {
     percent,
     plusMinus,
     clear,
+    allClear,
 }
