@@ -1,5 +1,6 @@
 :host {
-    display: flex;
+    overflow: auto;
+    resize: both;
     width: 400px;
     height: 700px;
     background: white;
