@@ -34,9 +34,6 @@ export class IosCalculatorComponent implements OnInit {
         //     ui.size.height / elHeight
         // );
 
-        // console.log(this.elRef);
-        // console.log(this.container);
-
         // 5 + 10 * 2 * 3 + 7 + 1 = 73
         const result = chain(add(chain(multiply(10), multiply(2))(3)), add(7), add(1))(5);
         console.log(result === 73, result);
@@ -44,9 +41,14 @@ export class IosCalculatorComponent implements OnInit {
 
     clickNumber(num: number) {
         const state = this.state;
+
+        if (this.state.newlyClickedOperator) {
+            this.state.value = 0;
+            this.state.newlyClickedOperator = false;
+        }
+
         if (state.operator !== Operator.none) {
             const newValue = state.value * 10 + num;
-
         } else {
             const newValue = state.value * 10 + num;
             this.state = {
@@ -57,50 +59,57 @@ export class IosCalculatorComponent implements OnInit {
     }
 
     clickOperator(operator: Operator) {
-        console.log('state', this.state);
         switch (operator) {
             case Operator.add:
-                let newOperation: Operation = null;
-                let newState: State = null;
-                if (!this.state.rootOperation) {
-                    newOperation = {
-                        value: this.state.value,
-                        funcs: [],
-                        operator: operator,
-                        child: null,
-                    };
-
-                    newState = {
-                        ...this.state,
-                        rootOperation: newOperation,
-                        operation: newOperation,
-                    };
-                } else {
-                    newOperation = {
-                        value: this.state.value,
-                        funcs: [],
-                        operator: operator,
-                        child: null,
-                    };
-
-                    newState = {
-                        ...this.state,
-                    };
-                    newState.operation.child = newOperation;
-                    newState.operation = newOperation;
-                }
-
-                newState.value = 0;
-                this.state = newState;
+                const addState = this.getNewOperationState(this.state, operator);
+                addState.newlyClickedOperator = true;
+                this.state = addState;
+                break;
+            case Operator.minus:
+                const mnsState = this.getNewOperationState(this.state, operator);
+                mnsState.newlyClickedOperator = true;
+                this.state = mnsState;
                 break;
             case Operator.equal:
-                this.evaluateOperation(this.state.rootOperation);
+                const eqState = this.getNewOperationState(this.state);
+                const newValue = this.evaluateOperation(eqState.rootOperation);
+                eqState.rootOperation = null;
+                eqState.value = newValue;
+                this.state = eqState;
+                console.log('evaluation', newValue);
                 break;
             case Operator.allClear:
+                this.state = INITIAL_STATE;
                 break;
         }
         console.log('root', this.state.rootOperation);
         console.log('new', this.state.operation);
+    }
+
+    getNewOperationState(oldState: State, operator?: Operator): State {
+        const newOperation: Operation = {
+            value: oldState.value,
+            funcs: [],
+            operator: operator,
+            child: null,
+        };
+        let newState: State = null;
+
+        if (!oldState.rootOperation) {
+            newState = {
+                ...oldState,
+                rootOperation: newOperation,
+                operation: newOperation,
+            };
+        } else {
+            newState = {
+                ...oldState,
+            };
+        }
+
+        newState.operation.child = newOperation;
+        newState.operation = newOperation;
+        return newState;
     }
 
     evaluateOperation(operation: Operation) {
@@ -114,6 +123,7 @@ export class IosCalculatorComponent implements OnInit {
             case Operator.minus:
                 return minus(operation.value)(childValue);
         }
+        return childValue;
     }
 }
 
@@ -160,6 +170,7 @@ const INITIAL_STATE: State = {
     chain: (a: number) => a,
     rootOperation: null,
     operation: null,
+    newlyClickedOperator: false,
 };
 
 export interface State {
@@ -171,6 +182,7 @@ export interface State {
     chain: (a: number) => number;
     operation: Operation;
     rootOperation: Operation;
+    newlyClickedOperator: boolean;
 }
 
 interface Operation {
