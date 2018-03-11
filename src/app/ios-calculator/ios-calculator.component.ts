@@ -61,22 +61,23 @@ export class IosCalculatorComponent implements OnInit {
     clickOperator(operator: Operator) {
         switch (operator) {
             case Operator.add:
-                const addState = this.getNewOperationState(this.state, operator);
+                const addState = this.getNewOperationState(this.state, this.state.value, operator);
                 addState.newlyClickedOperator = true;
                 this.state = addState;
                 break;
             case Operator.minus:
-                const mnsState = this.getNewOperationState(this.state, operator);
+                const mnsState = this.getNewOperationState(this.state, this.state.value, operator);
                 mnsState.newlyClickedOperator = true;
                 this.state = mnsState;
                 break;
+            case Operator.multiply:
+                const mltState = this.getMultiplyOperationState(this.state);
+                mltState.newlyClickedOperator = true;
+                this.state = mltState;
+                break;
             case Operator.equal:
-                const eqState = this.getNewOperationState(this.state);
-                const newValue = this.evaluateOperation(eqState.rootOperation);
-                eqState.rootOperation = null;
-                eqState.value = newValue;
+                const eqState = this.getNewEqualOperationState(this.state);
                 this.state = eqState;
-                console.log('evaluation', newValue);
                 break;
             case Operator.allClear:
                 this.state = INITIAL_STATE;
@@ -86,9 +87,9 @@ export class IosCalculatorComponent implements OnInit {
         console.log('new', this.state.operation);
     }
 
-    getNewOperationState(oldState: State, operator?: Operator): State {
+    getNewOperationState(oldState: State, value: number, operator?: Operator): State {
         const newOperation: Operation = {
-            value: oldState.value,
+            value: value,
             funcs: [],
             operator: operator,
             child: null,
@@ -110,6 +111,47 @@ export class IosCalculatorComponent implements OnInit {
         newState.operation.child = newOperation;
         newState.operation = newOperation;
         return newState;
+    }
+
+    getNewEqualOperationState(state: State): State {
+        let newRootOperation: Operation = null;
+        let result: State = null;
+        if (!state.rootOperation && state.operation) {
+            newRootOperation = {
+                ...state.operation,
+                value: state.value,
+            };
+            const oldOperationValue = state.operation.value;
+            state.rootOperation = newRootOperation;
+            state.operation = newRootOperation;
+            result = this.getNewOperationState(state, oldOperationValue);
+        } else {
+            result = this.getNewOperationState(state, state.value);
+        }
+        const newValue = this.evaluateOperation(result.rootOperation);
+
+        const newOperation: Operation = {
+            ...result.operation,
+            operator: state.operation.operator,
+        };
+
+        result.operation = newOperation;
+        result.rootOperation = null;
+        result.value = newValue;
+
+        console.log('evaluation', newValue);
+        return result;
+    }
+
+    getMultiplyOperationState(state: State): State {
+        const result: State = this.getNewOperationState(state, state.value, Operator.multiply);
+
+        if (!result.operation.funcs) {
+            result.operation.funcs = [];
+        }
+        result.operation.funcs.push(multiply(state.value));
+
+        return result;
     }
 
     evaluateOperation(operation: Operation) {
