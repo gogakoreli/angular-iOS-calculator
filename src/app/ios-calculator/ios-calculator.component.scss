@@ -39,7 +39,7 @@
         margin: 0px -5px 50px 0px;
         display: flex;
         align-items: center;
-        direction: rtl;
+        justify-content: flex-end;
         color: white;
     }
 }
@@ -70,7 +70,10 @@
         color: white;
         padding-bottom: 12px;
         padding-right: 3px;
-        transition: background 500ms ease-out;
+    }
+    .active {
+        background: white;
+        color: #ff9500;
     }
 }
 

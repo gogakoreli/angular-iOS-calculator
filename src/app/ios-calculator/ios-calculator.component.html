@@ -24,10 +24,13 @@
             </div>
         </div>
         <div class="right-operator-container">
-            <button (click)="clickOperator('divide')" class="right-operator">÷</button>
-            <button (click)="clickOperator('multiply')" class="right-operator">×</button>
-            <button (click)="clickOperator('minus')" class="right-operator">−</button>
-            <button (click)="clickOperator('add')" class="right-operator">+</button>
+            <button [class.active]="isActiveOperator('divide')" (click)="clickOperator('divide')"
+                class="right-operator">÷</button>
+            <button [class.active]="isActiveOperator('multiply')" (click)="clickOperator('multiply')"
+                class="right-operator">×</button>
+            <button [class.active]="isActiveOperator('minus')" (click)="clickOperator('minus')"
+                class="right-operator">−</button>
+            <button [class.active]="isActiveOperator('add')" (click)="clickOperator('add')" class="right-operator">+</button>
             <button (click)="clickOperator('equal')" class="right-operator">=</button>
         </div>
     </div>
