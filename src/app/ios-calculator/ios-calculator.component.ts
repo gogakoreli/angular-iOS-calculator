@@ -1,7 +1,13 @@
 import {
+    AfterViewChecked,
     Component,
+    DoCheck,
     ElementRef,
+    HostListener,
+    Input,
+    OnChanges,
     OnInit,
+    SimpleChanges,
     ViewChild
     } from '@angular/core';
 import { build$ } from 'protractor/built/element';
@@ -13,21 +19,44 @@ import { build$ } from 'protractor/built/element';
 })
 export class IosCalculatorComponent implements OnInit {
 
+    REAL_WIDTH = 750;
+    REAL_HEIGHT = 1334;
+
     state: State = INITIAL_STATE;
 
     @ViewChild('container') containerRef: ElementRef;
+
+    calculator: HTMLElement;
+    container: HTMLElement;
+
+    @Input() width = 375;
+    @Input() height = 667;
 
     constructor(
         private calculatorRef: ElementRef,
     ) { }
 
     ngOnInit() {
-        const calculator: HTMLElement = this.calculatorRef.nativeElement;
-        const container: HTMLElement = this.containerRef.nativeElement;
+        this.calculator = this.calculatorRef.nativeElement;
+        this.container = this.containerRef.nativeElement;
 
-        // 5 + 10 * 2 * 3 + 7 + 1 = 73
-        // const result = chain(add(chain(multiply(10), multiply(2))(3)), add(7), add(1))(5);
-        // console.log(result === 73, result);
+        this.onResize();
+
+        // window.addEventListener('resize', this.onResize);
+
+        // 5 + 10 / 2 * 2 * 3 + 7 - 1 = 41
+        // const result = chain(add(chain(multiply(10), divide(2), multiply(2))(3)), add(7), minus(1))(5);
+        // console.log(result === 41, result);
+    }
+
+    onResize() {
+        if (this.calculator && this.container) {
+            // const width = this.calculator.clientWidth;
+            // const height = this.calculator.clientHeight;
+            const scale = Math.min(this.width / this.REAL_WIDTH, this.height / this.REAL_HEIGHT);
+
+            this.container.style.zoom = scale.toString();
+        }
     }
 
     clickNumber(num: number) {
@@ -66,6 +95,7 @@ export class IosCalculatorComponent implements OnInit {
                 this.state.operator = operator;
                 this.state.newlyClickedOperator = true;
                 this.state.value = this.evaluateOperations(this.state.operations);
+                this.state.operations = [];
                 break;
             case Operator.allClear:
                 this.state.operations = [];
@@ -74,12 +104,12 @@ export class IosCalculatorComponent implements OnInit {
                 this.state.operator = Operator.none;
                 break;
         }
-        console.log('state', this.state);
     }
 
     updateStateOperations(state: State) {
         let newOperation: Operation = null;
         if (state.operator === Operator.none
+            || state.operator === Operator.equal
             || state.operator === Operator.allClear
             || state.operator === Operator.clear) {
             const func = state.value >= 0 ? add : minus;
@@ -126,7 +156,6 @@ export class IosCalculatorComponent implements OnInit {
             }
         });
         const result = chain(...arr)(0);
-        console.log('result of evaluation', result);
         return result;
     }
 
@@ -162,7 +191,7 @@ function multiply(a: number): (b: number) => number {
 }
 
 function divide(a: number): (b: number) => number {
-    return (b) => a / b;
+    return (b) => b / a;
 }
 
 function chain(...fns: ((a: number) => number)[]): (b: number) => number {
