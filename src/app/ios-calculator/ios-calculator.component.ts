@@ -41,8 +41,6 @@ export class IosCalculatorComponent implements OnInit {
 
         this.onResize();
 
-        // window.addEventListener('resize', this.onResize);
-
         // 5 + 10 / 2 * 2 * 3 + 7 - 1 = 41
         // const result = chain(add(chain(multiply(10), divide(2), multiply(2))(3)), add(7), minus(1))(5);
         // console.log(result === 41, result);
@@ -50,10 +48,7 @@ export class IosCalculatorComponent implements OnInit {
 
     onResize() {
         if (this.calculator && this.container) {
-            // const width = this.calculator.clientWidth;
-            // const height = this.calculator.clientHeight;
             const scale = Math.min(this.width / this.REAL_WIDTH, this.height / this.REAL_HEIGHT);
-
             this.container.style.zoom = scale.toString();
         }
     }
@@ -64,55 +59,77 @@ export class IosCalculatorComponent implements OnInit {
             this.state.newlyClickedOperator = false;
         }
         const newValue = this.state.value * 10 + num;
-        this.state.value = newValue;
-        this.state.newlyClickedNumber = true;
+        if (newValue < 1000000) {
+            this.state.value = newValue;
+            this.state.newlyClickedNumber = true;
+        }
     }
 
     clickOperator(operator: Operator) {
-        this.state.newlyClickedNumber = false;
-        this.state.newlyClickedOperator = true;
         switch (operator) {
             case Operator.add:
-                this.displayLastPossibleValue();
                 this.updateStateOperations(this.state);
+                this.displayLastPossibleValue();
                 this.state.operator = operator;
                 break;
             case Operator.minus:
-                this.displayLastPossibleValue();
                 this.updateStateOperations(this.state);
+                this.displayLastPossibleValue();
                 this.state.operator = operator;
                 break;
             case Operator.multiply:
-                this.displayLastPossibleValue(true);
                 this.updateStateOperations(this.state);
+                this.displayLastPossibleValue(true);
                 this.state.operator = operator;
                 break;
             case Operator.divide:
-                this.displayLastPossibleValue(true);
                 this.updateStateOperations(this.state);
+                this.displayLastPossibleValue(true);
                 this.state.operator = operator;
                 break;
             case Operator.equal:
-                this.updateStateOperations(this.state);
+                this.updateStateOperations(this.state, operator);
                 this.state.operator = operator;
                 this.state.value = this.evaluateOperations(this.state.operations);
                 this.state.displayValue = null;
                 this.state.operations = [];
                 break;
+            case Operator.plusMinus:
+                this.state.value = -1 * this.state.value;
+                this.state.newlyClickedNumber = true;
+                this.state.newlyClickedOperator = false;
+                break;
+            case Operator.percent:
+                this.state.value = this.state.value * 1 / 100;
+                this.state.newlyClickedNumber = true;
+                this.state.newlyClickedOperator = false;
+                break;
             case Operator.allClear:
                 this.resetState();
                 break;
+            case Operator.clear:
+                this.state.value = 0;
+                break;
+            case Operator.dot:
+                this.state.hasDot = true;
+                break;
         }
-        console.log(this.state.operations);
     }
 
-    updateStateOperations(state: State) {
+    updateStateOperations(state: State, operator?: Operator) {
+        if (this.onlyChangingOperator(state) && operator !== Operator.equal) {
+            return;
+        }
+
+        this.state.newlyClickedNumber = false;
+        this.state.newlyClickedOperator = true;
+
         let newOperation: Operation = null;
         if (state.operator === Operator.none
             || state.operator === Operator.equal
             || state.operator === Operator.allClear
             || state.operator === Operator.clear) {
-            const func = state.value >= 0 ? add : minus;
+            const func = add; // state.value >= 0 ? add : minus;
             newOperation = {
                 value: state.value,
                 func: func,
@@ -143,6 +160,21 @@ export class IosCalculatorComponent implements OnInit {
             const lastOperation = state.operations[state.operations.length - 1];
             lastOperation.operations.push(newOperation);
         }
+    }
+
+    isMathematicOperator(operator: Operator) {
+        return operator === Operator.add ||
+            operator === Operator.minus ||
+            operator === Operator.multiply ||
+            operator === Operator.divide;
+    }
+
+    onlyChangingOperator(state: State) {
+        if (this.isMathematicOperator(state.operator) &&
+            state.newlyClickedNumber === false) {
+            return true;
+        }
+        return false;
     }
 
     resetState() {
@@ -196,6 +228,7 @@ export class IosCalculatorComponent implements OnInit {
         } else {
             result = this.state.displayValue || this.state.value;
         }
+        result = <any>this.insertComma(result);
         return result;
     }
 
@@ -204,6 +237,21 @@ export class IosCalculatorComponent implements OnInit {
             const latestValue = this.evaluateOperations(this.state.operations, onlyChildren);
             this.state.displayValue = latestValue;
         }
+    }
+
+    insertComma(num: number) {
+        let result = num + '';
+        if (num >= 1000 && num <= 1000000) {
+            const left = Math.floor(num / 1000);
+            const right = num - left * 1000;
+            const afterDot = right - Math.floor(right);
+            result = `${left.toString()},${this.pad(Math.floor(right), 2)}${right}`;
+        }
+        return result;
+    }
+
+    pad(num, size) {
+        return ('000000000000000').substr(-size);
     }
 
 }
@@ -249,6 +297,7 @@ const INITIAL_STATE: State = {
     newlyClickedOperator: false,
     newlyClickedNumber: false,
     operations: [],
+    hasDot: false,
 };
 
 export interface State {
@@ -258,6 +307,7 @@ export interface State {
     newlyClickedOperator: boolean;
     newlyClickedNumber: boolean;
     operations: Operation[];
+    hasDot: boolean;
 }
 
 interface Operation {
