@@ -22,15 +22,14 @@ export class IosCalculatorComponent implements OnInit {
     REAL_WIDTH = 750;
     REAL_HEIGHT = 1334;
 
-    state: State = INITIAL_STATE;
-
     @ViewChild('container') containerRef: ElementRef;
-
     calculator: HTMLElement;
     container: HTMLElement;
 
     @Input() width = 375;
     @Input() height = 667;
+
+    state: State = INITIAL_STATE;
 
     constructor(
         private calculatorRef: ElementRef,
@@ -66,44 +65,45 @@ export class IosCalculatorComponent implements OnInit {
         }
         const newValue = this.state.value * 10 + num;
         this.state.value = newValue;
+        this.state.newlyClickedNumber = true;
     }
 
     clickOperator(operator: Operator) {
+        this.state.newlyClickedNumber = false;
+        this.state.newlyClickedOperator = true;
         switch (operator) {
             case Operator.add:
+                this.displayLastPossibleValue();
                 this.updateStateOperations(this.state);
                 this.state.operator = operator;
-                this.state.newlyClickedOperator = true;
                 break;
             case Operator.minus:
+                this.displayLastPossibleValue();
                 this.updateStateOperations(this.state);
                 this.state.operator = operator;
-                this.state.newlyClickedOperator = true;
                 break;
             case Operator.multiply:
+                this.displayLastPossibleValue(true);
                 this.updateStateOperations(this.state);
                 this.state.operator = operator;
-                this.state.newlyClickedOperator = true;
                 break;
             case Operator.divide:
+                this.displayLastPossibleValue(true);
                 this.updateStateOperations(this.state);
                 this.state.operator = operator;
-                this.state.newlyClickedOperator = true;
                 break;
             case Operator.equal:
                 this.updateStateOperations(this.state);
                 this.state.operator = operator;
-                this.state.newlyClickedOperator = true;
                 this.state.value = this.evaluateOperations(this.state.operations);
+                this.state.displayValue = null;
                 this.state.operations = [];
                 break;
             case Operator.allClear:
-                this.state.operations = [];
-                this.state.newlyClickedOperator = false;
-                this.state.value = 0;
-                this.state.operator = Operator.none;
+                this.resetState();
                 break;
         }
+        console.log(this.state.operations);
     }
 
     updateStateOperations(state: State) {
@@ -145,17 +145,30 @@ export class IosCalculatorComponent implements OnInit {
         }
     }
 
-    evaluateOperations(operations: Operation[]) {
+    resetState() {
+        this.state.operations = [];
+        this.state.newlyClickedOperator = false;
+        this.state.newlyClickedNumber = true;
+        this.state.value = 0;
+        this.state.displayValue = null;
+        this.state.operator = Operator.none;
+    }
+
+    evaluateOperations(operations: Operation[], onlyChildren = false) {
         const arr = [];
+        let result = 0;
         operations.forEach(oper => {
             const operFuncs = oper.operations.map(x => x.func(x.value));
-            if (operFuncs && operFuncs.length > 0) {
+            if ((operFuncs && operFuncs.length > 0) || onlyChildren) {
                 arr.push(oper.func(chain(...operFuncs)(oper.value)));
             } else {
                 arr.push(oper.func(oper.value));
             }
         });
-        const result = chain(...arr)(0);
+        if (arr && arr.length > 0) {
+            const items = (onlyChildren && [arr[arr.length - 1]]) || arr;
+            result = chain(...items)(0);
+        }
         return result;
     }
 
@@ -174,6 +187,23 @@ export class IosCalculatorComponent implements OnInit {
 
     isActiveOperator(operator: Operator) {
         return this.state.operator === operator && this.state.newlyClickedOperator;
+    }
+
+    getDisplayValue() {
+        let result = 0;
+        if (this.state.newlyClickedNumber) {
+            result = this.state.value;
+        } else {
+            result = this.state.displayValue || this.state.value;
+        }
+        return result;
+    }
+
+    displayLastPossibleValue(onlyChildren = false) {
+        if (this.state.operations) {
+            const latestValue = this.evaluateOperations(this.state.operations, onlyChildren);
+            this.state.displayValue = latestValue;
+        }
     }
 
 }
@@ -214,15 +244,19 @@ export enum Operator {
 
 const INITIAL_STATE: State = {
     value: 0,
+    displayValue: null,
     operator: Operator.none,
     newlyClickedOperator: false,
+    newlyClickedNumber: false,
     operations: [],
 };
 
 export interface State {
     value: number;
+    displayValue: number;
     operator: Operator;
     newlyClickedOperator: boolean;
+    newlyClickedNumber: boolean;
     operations: Operation[];
 }
 
