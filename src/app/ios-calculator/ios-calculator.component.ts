@@ -122,6 +122,7 @@ export class IosCalculatorComponent implements OnInit {
                 this.state.hasDot = true;
                 break;
         }
+        console.log(this.state);
     }
 
     updateStateOperations(state: State, operator?: Operator) {
@@ -242,7 +243,7 @@ export class IosCalculatorComponent implements OnInit {
     displayLastPossibleValue(onlyChildren = false) {
         if (this.state.operations) {
             const latestValue = this.evaluateOperations(this.state.operations, onlyChildren);
-            this.state.displayValue = latestValue;
+            this.state.value = latestValue;
         }
     }
 
