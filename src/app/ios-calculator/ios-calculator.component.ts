@@ -58,6 +58,14 @@ export class IosCalculatorComponent implements OnInit {
             this.state.value = 0;
             this.state.newlyClickedOperator = false;
         }
+
+        // 10.23 10.234
+        if (this.state.hasDot) {
+
+        } else {
+
+        }
+
         const newValue = this.state.value * 10 + num;
         if (newValue < 1000000) {
             this.state.value = newValue;
@@ -129,10 +137,9 @@ export class IosCalculatorComponent implements OnInit {
             || state.operator === Operator.equal
             || state.operator === Operator.allClear
             || state.operator === Operator.clear) {
-            const func = add; // state.value >= 0 ? add : minus;
             newOperation = {
                 value: state.value,
-                func: func,
+                func: add,
                 operations: [],
             };
             state.operations.push(newOperation);
@@ -240,18 +247,39 @@ export class IosCalculatorComponent implements OnInit {
     }
 
     insertComma(num: number) {
+        num = this.roundUpTo(num, 4);
         let result = num + '';
+
         if (num >= 1000 && num <= 1000000) {
-            const left = Math.floor(num / 1000);
-            const right = num - left * 1000;
-            const afterDot = right - Math.floor(right);
-            result = `${left.toString()},${this.pad(Math.floor(right), 2)}${right}`;
+            // 120305.12 120,305.12
+            // 13.3333333 13.334
+            const tmp = num.toString();
+
+            const dotIndex = tmp.indexOf('.');
+            let beforeDot = (dotIndex >= 0 && tmp.substr(0, dotIndex)) || tmp;
+            const afterDot = (dotIndex >= 0 && tmp.substr(dotIndex)) || '';
+
+            beforeDot = this.insertCommaFromRight(beforeDot);
+
+            result = `${beforeDot}${afterDot}`;
         }
         return result;
     }
 
-    pad(num, size) {
-        return ('000000000000000').substr(-size);
+    insertCommaFromRight(str: string) {
+        const left = str.substr(0, str.length - 3);
+        const right = str.substr(str.length - 3);
+        return `${left},${right}`;
+    }
+
+    roundUpTo(num: number, upTo: number) {
+        const floored = Math.floor(num);
+        const pow = Math.pow(10, upTo);
+        let afterDot = num - floored;
+        afterDot = afterDot * pow;
+        afterDot = Math.round(afterDot);
+        afterDot = afterDot / pow;
+        return floored + afterDot;
     }
 
 }
